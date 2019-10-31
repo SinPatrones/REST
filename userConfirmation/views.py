@@ -3,7 +3,7 @@ import io
 from collections import namedtuple
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser, FileUploadParser
+from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -48,7 +48,8 @@ def usuario_detail(request,pk):
     elif request.method == 'DELETE':
         user.delete()
         return HttpResponse(status = 204)
-        
+
+
 @api_view(['GET','POST'])
 def user_list(request,format = None):
     if request.method == 'GET':
@@ -110,18 +111,29 @@ def confirmPass(request, format = None):
         contentData = {'id_user':'False', 'password':'False'}
         return Response(contentData,status=status.HTTP_406_NOT_ACCEPTABLE)
 
-def uploadImg(request):
-    #serializer = ImgUploadSerializer(data=request.data)
-    #serializer.is_valid()
-    #content = JSONRenderer().render(serializer.data)
-    #img = json.loads(content, object_hook=lambda d: namedtuple('X',d.keys())(*d.values()))#this image es la tupla del objeto
-    #falta el verdadero objeto
-    img = ImgUpload.objects.all()
-    img = img[0]
-    uploadImg = request.FILES['filename']
-    img.picture.save("image.jpg",uploadImg)
-    img.save()
-    return JsonResponse({'result':'Success'})
+
+class UploadImg(APIView):
+
+    parser_classes = [MultiPartParser]
+
+    def get(self, request):
+        imgs = ImgUpload.objects.all()
+        serializer = ImgUploadSerializer(imgs, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    def post(self, request, format=None):
+        try:
+            ImgUpload.objects.create(
+                filename=request.data['filename'],
+                picture=request.data['picture']
+            )
+            return JsonResponse({'message': 'Imagen subida con exito'}, status=201)
+        except Exception as e:
+            print(e.args[0])
+            return JsonResponse({
+                'error': e.args[0]},
+                status=400)
+
 
 class FileUploadView(APIView):
     parser_class = (FileUploadParser,)
