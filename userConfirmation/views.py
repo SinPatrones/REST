@@ -5,12 +5,14 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser
 from rest_framework.renderers import JSONRenderer
+from rest_framework.generics import (CreateAPIView)
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from userConfirmation.models import Usuario,ImgUpload
-from userConfirmation.serializers import UsuarioSerializer, FileSerializer, ImgUploadSerializer
+from userConfirmation.models import Usuario,ImgUpload, Inventario
+from userConfirmation.serializers import UsuarioSerializer, FileSerializer, ImgUploadSerializer, InventarioSerializer
+
 
 @csrf_exempt
 def usuario_list(request):
@@ -22,7 +24,7 @@ def usuario_list(request):
         data = JSONParser().parse(request)
         serializer = UsuarioSerializer(data=data)
         if serializer.is_valid():
-            serialize.save()
+            serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
 
@@ -64,6 +66,13 @@ def user_list(request,format = None):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def inventario_list(request,format = None):
+    if request.method == 'GET':
+        inventario = Inventario.objects.all()
+        serializer = InventarioSerializer(inventario,many=True)
+        return Response(serializer.data)
+        
 @api_view(['GET','PUT','DELETE'])
 def user_detail(request,pk, format = None):
     try:
@@ -111,11 +120,20 @@ def confirmPass(request, format = None):
         contentData = {'id_user':'False', 'password':'False'}
         return Response(contentData,status=status.HTTP_406_NOT_ACCEPTABLE)
 
+@api_view(['POST'])
+def confirmInventario(request, format = None):
+    if request.method == 'POST':
+        serializer = InventarioSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            content = {'succes':'True'}
+            return Response(content, status=status.HTTP_200_OK)
+        content = {'succes':'False'}
+        return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
+
 
 class UploadImg(APIView):
-
     parser_classes = [MultiPartParser]
-
     def get(self, request):
         imgs = ImgUpload.objects.all()
         serializer = ImgUploadSerializer(imgs, many=True)
@@ -133,7 +151,6 @@ class UploadImg(APIView):
             return JsonResponse({
                 'error': e.args[0]},
                 status=400)
-
 
 class FileUploadView(APIView):
     parser_class = (FileUploadParser,)

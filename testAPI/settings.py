@@ -25,7 +25,8 @@ SECRET_KEY = 'rer(&+il&d8mwn*!^rfi7+lng@un4)mro2-bd558-0qyp5apln'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost','192.168.43.163'
+#AGREGAR EL SERVIDOR PARA PODER USARLO EN RED
+ALLOWED_HOSTS = ['*'
 ]
 
 
@@ -38,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userConfirmation',
+    'imageupload',
+    'imageupload_rest',
     'rest_framework',
 ]
 
@@ -121,5 +124,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_ROOT = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/inventario') #CAMBIAMOS EL PATH DE GAURDADO DE IMAGENES
 MEDIA_URL = '/media/'

@@ -1,0 +1,5 @@
+django
+djngorestframework
+markdown
+django-filter
+pillow
