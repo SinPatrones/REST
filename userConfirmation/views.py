@@ -10,8 +10,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from userConfirmation.models import Usuario,ImgUpload, Inventario
-from userConfirmation.serializers import UsuarioSerializer, FileSerializer, ImgUploadSerializer, InventarioSerializer
+from userConfirmation.models import Usuario,ImgUpload, Inventario, BarCode
+from userConfirmation.serializers import UsuarioSerializer, FileSerializer, ImgUploadSerializer, InventarioSerializer, BarCodeSerializer
 
 
 @csrf_exempt
@@ -72,6 +72,13 @@ def inventario_list(request,format = None):
         inventario = Inventario.objects.all()
         serializer = InventarioSerializer(inventario,many=True)
         return Response(serializer.data)
+
+@api_view(['POST'])
+def inventario_barcode(request,format = None):
+    if request.method == 'POST':
+        inventario = Inventario.objects.filter(codigo=request.data['codigo'])
+        serializer = InventarioSerializer(inventario[0])
+        return Response(serializer.data)
         
 @api_view(['GET','PUT','DELETE'])
 def user_detail(request,pk, format = None):
@@ -83,7 +90,6 @@ def user_detail(request,pk, format = None):
     if request.method == 'GET':
         serializer = UsuarioSerializer(user)
         return Response(serializer.data)
-
     elif request.method == 'PUT':
         serializer = UsuarioSerializer(user, data=request.data)
         if serializer.is_valid():
@@ -123,7 +129,11 @@ def confirmPass(request, format = None):
 @api_view(['POST'])
 def confirmInventario(request, format = None):
     if request.method == 'POST':
+        barcode = BarCode(codigo=request.data['codigo'])#SIN ESTO NO RECONOCE EL FOREIGN KEY EN LA VALIDACIONDEL SERIALIZERINVENTARIO
+        barcode.save()
         serializer = InventarioSerializer(data=request.data)
+        #contentInventario = JSONRenderer().render(serializer.data)
+        #contentInventarioCodigo = json.loads(contentInventario, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))  # funcion para acceder a las variables de json
         if serializer.is_valid():
             serializer.save()
             content = {'succes':'True'}

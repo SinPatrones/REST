@@ -11,6 +11,7 @@ urlpatterns = [
     path('confirmPass/', views.confirmPass),
     path('confirmInventario/', views.confirmInventario),
     path('inventario/',views.inventario_list),
+    path('barcodescan/',views.inventario_barcode),
     #path('upload-img/', views.UploadImg.as_view()),
     #path('', FileUploadView.as_view())
 ]

@@ -15,8 +15,13 @@ class Usuario(models.Model):
     def __str__(self):
         return self.id_user
 
+class BarCode(models.Model):
+    codigo = models.CharField(primary_key=True, max_length=100,null=False)
+    # add tipo de barcode future
+
 class Inventario(models.Model):
-    codigo = models.CharField(max_length = 100, blank = False, unique = True)
+    #codigo = models.CharField(max_length=100,unique=True,blank=False,null=True)
+    codigo = models.ForeignKey(BarCode, on_delete = models.CASCADE, null= True,unique=True)
     denominacion = models.CharField(max_length = 100, blank = False)
     marca = models.CharField(max_length = 100, blank = False)
     modelo = models.CharField(max_length = 100, blank = False)
@@ -37,3 +42,4 @@ class ImgUpload(models.Model):
     filename = models.CharField(max_length=200, blank=False)
     picture = models.ImageField(upload_to="photos", null=True, blank=True)
 
+class 

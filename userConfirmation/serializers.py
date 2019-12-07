@@ -1,12 +1,17 @@
 from rest_framework import serializers
-from userConfirmation.models import Usuario, File, ImgUpload, Inventario
+from userConfirmation.models import Usuario, File, ImgUpload, Inventario, BarCode
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['id','id_user','password']
-    
+        fields = ['id','id_user','password','id_tipouser']
+
+class BarCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BarCode
+        fields = ['codigo']
+
 class InventarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventario
